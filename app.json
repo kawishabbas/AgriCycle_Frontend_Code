@@ -1,0 +1,66 @@
+{
+  "expo": {
+    "name": "AgriCycle",
+    "slug": "AgriCycle",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "AgriCycle needs camera access to photograph your waste for listings.",
+        "NSPhotoLibraryUsageDescription": "AgriCycle needs gallery access to upload waste photos.",
+        "NSLocationWhenInUseUsageDescription": "AgriCycle uses your location to auto-fill your city on waste listings."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.kawishsyedofficial.Agricycle"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "AgriCycle needs gallery access to upload waste photos.",
+          "cameraPermission": "AgriCycle needs camera access to photograph waste."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "AgriCycle uses your location to auto-fill city on listings."
+        }
+      ],
+      "expo-web-browser",
+      "expo-localization",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "a387d20f-bdfa-4067-8c0e-eda769890a65"
+      }
+    }
+  }
+}
