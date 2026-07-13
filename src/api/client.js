@@ -18,9 +18,16 @@ import Constants from 'expo-constants';
  *  Run `ipconfig` on Windows to find it (look for 192.168.x.x).
  * ─────────────────────────────────────────────────────────────
  */
-const MANUAL_IP = '172.20.10.2'; // Auto-set by START_DEV.bat // Auto-set by START_DEV.bat // Auto-set by START_DEV.bat
+const PRODUCTION_URL = 'http://98.94.8.46';
 
 const getBaseUrl = () => {
+  // If we have a production URL set, use it everywhere (web, iOS, Android)
+  if (PRODUCTION_URL) {
+    // Strip trailing slash if present, then append /api/v1
+    const base = PRODUCTION_URL.replace(/\/$/, '');
+    return `${base}/api/v1`;
+  }
+
   // Web always uses the host it was loaded from (fixes Network Error on localhost)
   if (Platform.OS === 'web') {
     if (typeof window !== 'undefined') {
@@ -28,9 +35,6 @@ const getBaseUrl = () => {
     }
     return 'http://localhost:8000/api/v1';
   }
-
-  // MANUAL_IP is used for physical phones
-  if (MANUAL_IP) return `http://${MANUAL_IP}:8000/api/v1`;
 
   // Try to read the host Expo is already using to serve the JS bundle
   const expoHost =
