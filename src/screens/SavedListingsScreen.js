@@ -8,6 +8,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import Colors from '../theme/colors';
 import client, { BASE_URL } from '../api/client';
 import { silentError } from '../utils/errorHandler';
+import { useAuth } from '../context/AuthContext';
+import GuestPrompt from '../components/GuestPrompt';
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=70';
 
@@ -22,6 +24,7 @@ const resolveImage = (images) => {
 };
 
 const SavedListingsScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [savedItems, setSavedItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -41,10 +44,24 @@ const SavedListingsScreen = ({ navigation }) => {
   // Re-fetch EVERY time the screen gains focus (not just on first mount)
   useFocusEffect(
     useCallback(() => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       fetchSavedListings().finally(() => setLoading(false));
-    }, [fetchSavedListings])
+    }, [fetchSavedListings, user])
   );
+
+  if (!user) {
+    return (
+      <GuestPrompt 
+        title="Saved Items" 
+        message="Sign in to view items you've bookmarked." 
+        icon="bookmark-outline" 
+      />
+    );
+  }
 
   const onRefresh = async () => {
     setRefreshing(true);

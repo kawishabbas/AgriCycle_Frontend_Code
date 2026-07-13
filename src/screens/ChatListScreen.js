@@ -19,6 +19,7 @@ import { useNotifications } from '../context/NotificationContext';
 import Colors from '../theme/colors';
 import client from '../api/client';
 import { silentError } from '../utils/errorHandler';
+import GuestPrompt from '../components/GuestPrompt';
 
 const timeAgo = (dateStr) => {
   if (!dateStr) return 'now';
@@ -124,6 +125,11 @@ const ChatListScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
     // Fetch initially on focus
     const unsubscribeFocus = navigation.addListener('focus', () => {
       fetchConversations();
@@ -136,7 +142,7 @@ const ChatListScreen = ({ navigation }) => {
       unsubscribeFocus();
       clearInterval(interval);
     };
-  }, [navigation]);
+  }, [navigation, user]);
 
   const fetchConversations = async () => {
     try {
@@ -181,6 +187,16 @@ const ChatListScreen = ({ navigation }) => {
       setDeleting(false);
     }
   };
+
+  if (!user) {
+    return (
+      <GuestPrompt 
+        title="Chats" 
+        message="Sign in to view your messages and chat with buyers and sellers." 
+        icon="chat-processing-outline" 
+      />
+    );
+  }
 
   const handlePress = (item) => {
     navigation?.navigate('ChatDetail', { conversation: item });

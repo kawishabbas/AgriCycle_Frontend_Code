@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [user,          setUser]          = useState(null);
   const [loading,       setLoading]       = useState(true);
   const [isFirstLaunch, setIsFirstLaunch] = useState(false);
+  const [isGuest,       setIsGuest]       = useState(true); // Default to true!
 
   // ─── Register logout callback so the API interceptor can trigger it ─────
   useEffect(() => {
@@ -21,6 +22,7 @@ export const AuthProvider = ({ children }) => {
         await AsyncStorage.removeItem('navState');
       } catch (e) {}
       setUser(null);
+      setIsGuest(true); // Becoming a guest after token clears
     });
     return () => setLogoutHandler(null);
   }, []);
@@ -100,6 +102,16 @@ export const AuthProvider = ({ children }) => {
     return `Server error (${status})`;
   };
 
+  // ─── Intro mode ────────────────────────────────────────────────────────────
+  const completeIntro = () => {
+    setIsFirstLaunch(false);
+  };
+
+  // ─── Guest mode ────────────────────────────────────────────────────────────
+  const continueAsGuest = () => {
+    setIsGuest(true);
+  };
+
   // ─── Login ────────────────────────────────────────────────────────────────
   const login = async (email, password) => {
     try {
@@ -112,6 +124,7 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.setItem('user',         JSON.stringify(data.user));
       await AsyncStorage.removeItem('navState'); // Force clean slate on login
       setUser(data.user);
+      setIsGuest(false);
       return data.user;
     } catch (err) {
       console.error('[Auth] Login:', err.response?.data ?? err.message);
@@ -128,6 +141,7 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.setItem('user',         JSON.stringify(data.user));
       await AsyncStorage.removeItem('navState'); // Force clean slate on guest login
       setUser(data.user);
+      setIsGuest(false);
       return data.user;
     } catch (err) {
       console.error('[Auth] Guest:', err.response?.data ?? err.message);
@@ -146,6 +160,7 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.setItem('user', JSON.stringify(data.user));
       await AsyncStorage.removeItem('navState'); // Force clean slate on register
       setUser(data.user);
+      setIsGuest(false);
       return data.user;
     } catch (err) {
       console.error('[Auth] Register:', err.response?.data ?? err.message);
@@ -170,16 +185,19 @@ export const AuthProvider = ({ children }) => {
   // ─── Logout — clears navState so user doesn't land on old screens ────────
   const logout = async () => {
     try {
+      await client.post('/auth/logout/', { refresh: await AsyncStorage.getItem('refreshToken') });
+    } catch (e) {
+      // Ignore logout errors
+    } finally {
       await AsyncStorage.removeItem('accessToken');
       await AsyncStorage.removeItem('refreshToken');
       await AsyncStorage.removeItem('user');
       await AsyncStorage.removeItem('navState');
-    } catch (e) {
-      console.error('Failed to clear async storage on logout', e);
+      setUser(null);
+      setIsGuest(true); // Logout makes you a guest again
     }
-    setUser(null);
     if (Platform.OS === 'web') {
-      window.history.replaceState(null, '', '/login');
+      window.history.replaceState(null, '', '/'); // Go to root instead of /login
     }
   };
 
@@ -197,10 +215,16 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider
       value={{
-        user, setUser,
-        login, loginGuest, logout, forceLogout,
-        register, updateProfile,
+        user,
+        loading,
         isFirstLaunch,
+        isGuest,
+        completeIntro,
+        login,
+        register,
+        logout,
+        continueAsGuest,
+        updateProfile,
       }}
     >
       {children}

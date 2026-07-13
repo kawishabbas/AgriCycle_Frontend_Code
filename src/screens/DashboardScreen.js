@@ -59,8 +59,12 @@ const DashboardScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      if (!user) {
+        setStatsLoading(false);
+        return;
+      }
       fetchDashboardData();
-    }, [])
+    }, [user])
   );
 
   const fetchDashboardData = async () => {

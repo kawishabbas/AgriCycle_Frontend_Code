@@ -17,7 +17,7 @@ import Colors from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
 
 const IntroScreen = ({ navigation }) => {
-  const { user } = useAuth();
+  const { user, completeIntro, continueAsGuest } = useAuth();
   const { width } = useWindowDimensions();
   const isTabletOrWeb = width > 768;
 
@@ -95,11 +95,8 @@ const IntroScreen = ({ navigation }) => {
                 style={styles.button}
                 activeOpacity={0.85}
                 onPress={() => {
-                  if (user?.admin_role) {
-                    navigation.replace('Admin');
-                  } else {
-                    navigation.replace('Main');
-                  }
+                  completeIntro();
+                  // App.js will naturally navigate to Main since isGuest is true by default
                 }}
               >
                 <Text style={styles.buttonText}>Get Started</Text>
@@ -229,7 +226,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.white,
     fontSize: 18,
-    fontFamily: 'Poppins_700Bold',
+    fontFamily: 'Poppins_600SemiBold',
+    marginRight: 8,
   },
 });
 

@@ -17,6 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import Colors from '../theme/colors';
 import client from '../api/client';
 import { showError, silentError, getErrorMessage } from '../utils/errorHandler';
+import GuestPrompt from '../components/GuestPrompt';
 
 
 const STATUS_COLORS = {
@@ -199,8 +200,10 @@ const OrdersScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchOrders();
-    }, [])
+      if (user) {
+        fetchOrders();
+      }
+    }, [user])
   );
 
   const fetchOrders = async () => {
@@ -214,6 +217,16 @@ const OrdersScreen = ({ navigation }) => {
       setLoading(false);
     }
   };
+
+  if (!user) {
+    return (
+      <GuestPrompt 
+        title="Your Orders" 
+        message="Sign in to view and track your orders." 
+        icon="package-variant-closed" 
+      />
+    );
+  }
 
   const handleMessage = async (order) => {
     const isSeller = user && order.seller?.id === user.id;

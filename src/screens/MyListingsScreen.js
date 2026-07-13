@@ -9,6 +9,8 @@ import Colors from '../theme/colors';
 import client, { BASE_URL } from '../api/client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { silentError, getErrorMessage } from '../utils/errorHandler';
+import { useAuth } from '../context/AuthContext';
+import GuestPrompt from '../components/GuestPrompt';
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=70';
 
@@ -30,6 +32,7 @@ const STATUS_COLOR = {
 };
 
 const MyListingsScreen = ({ navigation }) => {
+  const { user } = useAuth();
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,10 +53,24 @@ const MyListingsScreen = ({ navigation }) => {
 
   useFocusEffect(
     useCallback(() => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       fetchMyListings().finally(() => setLoading(false));
-    }, [])
+    }, [user])
   );
+
+  if (!user) {
+    return (
+      <GuestPrompt 
+        title="My Listings" 
+        message="Sign in to view and manage your waste listings." 
+        icon="format-list-bulleted" 
+      />
+    );
+  }
 
   const onRefresh = async () => {
     setRefreshing(true);

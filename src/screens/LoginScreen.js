@@ -17,7 +17,7 @@ import { useAuth } from '../context/AuthContext';
 import Colors from '../theme/colors';
 
 const LoginScreen = ({ navigation }) => {
-  const { login, loginGuest } = useAuth();
+  const { login, continueAsGuest } = useAuth();
 
   const [email,        setEmail]        = useState('');
   const [password,     setPassword]     = useState('');
@@ -250,12 +250,14 @@ const styles = StyleSheet.create({
     gap: 8, borderWidth: 1.5, borderColor: '#DB4437',
     borderRadius: 12, paddingVertical: 13,
   },
-  googleBtnText: { color: '#DB4437', fontSize: 15, fontWeight: '600' },
+  googleBtnText: {
+    color: '#DB4437', fontSize: 15, fontFamily: 'Poppins_600SemiBold',
+  },
 
-  // ── Register ──
-  registerRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center' },
-  registerPrompt: { fontSize: 14, color: Colors.textSecondary },
-  registerLink: { fontSize: 14, fontWeight: '700', color: Colors.primary },
+  // ── Register Link ──
+  registerRow:    { flexDirection: 'row', justifyContent: 'center', marginTop: 12 },
+  registerPrompt: { color: Colors.textMuted, fontSize: 14, fontFamily: 'Poppins_400Regular' },
+  registerLink:   { color: Colors.primary, fontSize: 14, fontFamily: 'Poppins_600SemiBold', textDecorationLine: 'underline' },
 });
 
 export default LoginScreen;

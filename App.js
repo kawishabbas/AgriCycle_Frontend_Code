@@ -154,17 +154,20 @@ const RootNavigator = () => {
 import { PanResponder } from 'react-native';
 
 const AppContent = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, isGuest, loading, isFirstLaunch, logout } = useAuth();
   const navigationRef = useRef(null);
   const isNavigatorReady = useRef(false);
   const timerId = useRef(null);
 
   // ── Navigate to correct screen based on auth state ──
-  const navigateByAuthState = (currentUser) => {
+  const navigateByAuthState = (currentUser, guestMode, firstLaunch) => {
     if (!isNavigatorReady.current || !navigationRef.current) return;
-    if (currentUser && currentUser.admin_role) {
+    
+    if (firstLaunch) {
+      navigationRef.current.reset({ index: 0, routes: [{ name: 'Intro' }] });
+    } else if (currentUser && currentUser.admin_role) {
       navigationRef.current.reset({ index: 0, routes: [{ name: 'Admin' }] });
-    } else if (currentUser) {
+    } else if (currentUser || guestMode) {
       navigationRef.current.reset({ index: 0, routes: [{ name: 'Main' }] });
     } else {
       navigationRef.current.reset({ index: 0, routes: [{ name: 'AuthStack' }] });
@@ -174,9 +177,9 @@ const AppContent = () => {
   // Trigger navigation whenever user state changes
   useEffect(() => {
     if (!loading) {
-      navigateByAuthState(user);
+      navigateByAuthState(user, isGuest, isFirstLaunch);
     }
-  }, [user, loading]);
+  }, [user, isGuest, isFirstLaunch, loading]);
 
   // ── Inactivity timeout ───────────────────────────────
   const resetTimer = () => {
@@ -206,7 +209,7 @@ const AppContent = () => {
         onReady={() => {
           isNavigatorReady.current = true;
           // Run once navigator is mounted with the correct initial route
-          if (!loading) navigateByAuthState(user);
+          if (!loading) navigateByAuthState(user, isGuest, isFirstLaunch);
         }}
       >
         <StatusBar style="dark" />
